@@ -112,7 +112,8 @@ namespace FakeP2P.Services
         /// </summary>
         /// <param name="serverId">The server identifier.</param>
         /// <param name="playerId">The player identifier.</param>
-        public void RemovePlayer(Guid serverId, string playerId)
+        /// <returns>The new player count on the given server.</returns>
+        public int RemovePlayer(Guid serverId, string playerId)
         {
             lock (lockObject)
             {
@@ -121,11 +122,14 @@ namespace FakeP2P.Services
                     if (server.Players.TryGetValue(playerId, out Player player))
                     {
                         server.Players.Remove(playerId);
+                        int newPlayerCount = server.Players.Count;
 
-                        if (server.Players.Count <= 0)
+                        if (newPlayerCount <= 0)
                         {
                             servers.Remove(serverId);
                         }
+
+                        return newPlayerCount;
                     }
                     else
                     {
@@ -143,10 +147,12 @@ namespace FakeP2P.Services
         /// Removes a player.
         /// </summary>
         /// <param name="playerId">The player identifier.</param>
-        public void RemovePlayer(string playerId)
+        /// <returns>A list with all changed player counts.</returns>
+        public IEnumerable<(Guid Server, int RemainingPlayerCount)> RemovePlayer(string playerId)
         {
             lock (lockObject)
             {
+                List<(Guid, int)> changes = new List<(Guid, int)>();
                 foreach (KeyValuePair<Guid, HostedServer> pair in servers)
                 {
                     if (servers.TryGetValue(pair.Key, out HostedServer server))
@@ -155,13 +161,17 @@ namespace FakeP2P.Services
                         {
                             server.Players.Remove(playerId);
 
-                            if (server.Players.Count <= 0)
+                            int newPlayerCount = server.Players.Count;
+                            changes.Add((server.Id, newPlayerCount));
+                            if (newPlayerCount <= 0)
                             {
                                 servers.Remove(pair.Key);
                             }
                         }
                     }
                 }
+
+                return changes;
             }
         }
 

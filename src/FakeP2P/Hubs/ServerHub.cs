@@ -55,8 +55,12 @@ namespace FakeP2P.Hubs
         /// <returns>A task leaving the server.</returns>
         public async Task LeaveServer(Guid serverId)
         {
-            serverService.RemovePlayer(serverId, Context.ConnectionId);
-            await Clients.Clients(serverService.GetPlayers(serverId)).PlayerLeft(serverId, Context.ConnectionId);
+            int remainingPlayerCount = serverService.RemovePlayer(serverId, Context.ConnectionId);
+            if (remainingPlayerCount > 0)
+            {
+                await Clients.Clients(serverService.GetPlayers(serverId)).PlayerLeft(serverId, Context.ConnectionId);
+            }
+
             await Clients.Caller.LeftServer(serverId);
         }
 
@@ -71,10 +75,18 @@ namespace FakeP2P.Hubs
             => Clients.Clients(serverService.GetPlayers(serverId)).Action(serverId, action, Context.ConnectionId, data);
 
         /// <inheritdoc/>
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
-            serverService.RemovePlayer(Context.ConnectionId);
-            return base.OnDisconnectedAsync(exception);
+            var changes = serverService.RemovePlayer(Context.ConnectionId);
+            foreach ((Guid server, int remainingPlayerCount) in changes)
+            {
+                if (remainingPlayerCount > 0)
+                {
+                    await Clients.Clients(serverService.GetPlayers(server)).PlayerLeft(server, Context.ConnectionId);
+                }
+            }
+
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }
