@@ -40,18 +40,10 @@ namespace FakeP2P
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(x =>
-            {
-                x.AllowAnyMethod()
+            app.UseCors(x => x.AllowAnyMethod()
                 .AllowAnyHeader()
-                .AllowCredentials();
-
-                string origins = Environment.GetEnvironmentVariable("CORS_ORIGINS");
-                if (origins != null)
-                {
-                    x.WithOrigins(origins.Split(','));
-                }
-            });
+                .AllowCredentials()
+                .SetIsOriginAllowed(origin => true));
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
