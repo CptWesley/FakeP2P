@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using FakeP2P.Hubs;
 using FakeP2P.Services;
@@ -39,7 +40,18 @@ namespace FakeP2P
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(x =>
+            {
+                x.AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+
+                string origins = Environment.GetEnvironmentVariable("CORS_ORIGINS");
+                if (origins != null)
+                {
+                    x.WithOrigins(origins.Split(','));
+                }
+            });
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
