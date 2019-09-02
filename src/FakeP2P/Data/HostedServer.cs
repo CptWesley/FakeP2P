@@ -7,7 +7,7 @@ namespace FakeP2P.Data
     /// Data class for storing server information.
     /// </summary>
     /// <seealso cref="BaseData" />
-    public class Server : BaseData
+    public class HostedServer : BaseData
     {
         /// <summary>
         /// Gets or sets the name.

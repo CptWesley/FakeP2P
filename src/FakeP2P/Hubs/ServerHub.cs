@@ -30,7 +30,7 @@ namespace FakeP2P.Hubs
         /// <returns>A task creating the server.</returns>
         public async Task CreateServer(string userName, string serverName, string serverType)
         {
-            Server server = serverService.CreateServer(serverName, serverType, Context.ConnectionId, userName);
+            HostedServer server = serverService.CreateServer(serverName, serverType, Context.ConnectionId, userName);
             await Clients.Caller.JoinedServer(server);
         }
 
@@ -43,7 +43,7 @@ namespace FakeP2P.Hubs
         public async Task JoinServer(Guid serverId, string userName)
         {
             Player player = serverService.AddPlayer(serverId, Context.ConnectionId, userName);
-            Server server = serverService.GetServer(serverId);
+            HostedServer server = serverService.GetServer(serverId);
             await Clients.Caller.JoinedServer(server);
             await Clients.Clients(serverService.GetPlayers(serverId)).PlayerJoined(serverId, player);
         }

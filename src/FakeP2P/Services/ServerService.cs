@@ -11,14 +11,14 @@ namespace FakeP2P.Services
     /// </summary>
     public class ServerService
     {
-        private readonly Dictionary<Guid, Server> servers = new Dictionary<Guid, Server>();
+        private readonly Dictionary<Guid, HostedServer> servers = new Dictionary<Guid, HostedServer>();
         private readonly object lockObject = new object();
 
         /// <summary>
         /// Gets all servers.
         /// </summary>
         /// <returns>A list of all servers.</returns>
-        public IEnumerable<Server> GetAllServers()
+        public IEnumerable<HostedServer> GetAllServers()
         {
             lock (lockObject)
             {
@@ -31,11 +31,11 @@ namespace FakeP2P.Services
         /// </summary>
         /// <param name="serverId">The server identifier.</param>
         /// <returns>A copy of the server with the given identifier.</returns>
-        public Server GetServer(Guid serverId)
+        public HostedServer GetServer(Guid serverId)
         {
             lock (lockObject)
             {
-                if (servers.TryGetValue(serverId, out Server server))
+                if (servers.TryGetValue(serverId, out HostedServer server))
                 {
                     return server.Copy(true);
                 }
@@ -54,9 +54,9 @@ namespace FakeP2P.Services
         /// <param name="connectionId">The connection ID of the player.</param>
         /// <param name="hostName">The hosting player name.</param>
         /// <returns>A copy of a newly created server.</returns>
-        public Server CreateServer(string name, string type, string connectionId, string hostName)
+        public HostedServer CreateServer(string name, string type, string connectionId, string hostName)
         {
-            Server server = new Server
+            HostedServer server = new HostedServer
             {
                 Id = Guid.NewGuid(),
                 Name = name,
@@ -95,7 +95,7 @@ namespace FakeP2P.Services
 
             lock (lockObject)
             {
-                if (servers.TryGetValue(guid, out Server server))
+                if (servers.TryGetValue(guid, out HostedServer server))
                 {
                     server.Players[player.Id] = player;
                     return player.Copy(true);
@@ -116,7 +116,7 @@ namespace FakeP2P.Services
         {
             lock (lockObject)
             {
-                if (servers.TryGetValue(serverId, out Server server))
+                if (servers.TryGetValue(serverId, out HostedServer server))
                 {
                     if (server.Players.TryGetValue(playerId, out Player player))
                     {
@@ -147,9 +147,9 @@ namespace FakeP2P.Services
         {
             lock (lockObject)
             {
-                foreach (KeyValuePair<Guid, Server> pair in servers)
+                foreach (KeyValuePair<Guid, HostedServer> pair in servers)
                 {
-                    if (servers.TryGetValue(pair.Key, out Server server))
+                    if (servers.TryGetValue(pair.Key, out HostedServer server))
                     {
                         if (server.Players.TryGetValue(playerId, out Player player))
                         {
@@ -174,7 +174,7 @@ namespace FakeP2P.Services
         {
             lock (lockObject)
             {
-                if (servers.TryGetValue(serverId, out Server server))
+                if (servers.TryGetValue(serverId, out HostedServer server))
                 {
                     return server.Players.Select(x => x.Value.Id).ToList();
                 }
@@ -185,10 +185,10 @@ namespace FakeP2P.Services
             }
         }
 
-        private Exception ServerNotFound(Guid guid)
+        private static Exception ServerNotFound(Guid guid)
             => new ArgumentException($"No server with id '{guid}' was found.");
 
-        private Exception PlayerNotFound(string guid)
+        private static Exception PlayerNotFound(string guid)
             => new ArgumentException($"No player with id '{guid}' was found.");
     }
 }

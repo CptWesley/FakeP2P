@@ -14,7 +14,7 @@ namespace FakeP2P.Hubs
         /// </summary>
         /// <param name="server">The server.</param>
         /// <returns>A task sending the message.</returns>
-        Task JoinedServer(Server server);
+        Task JoinedServer(HostedServer server);
 
         /// <summary>
         /// Message sent when a user has left the server.

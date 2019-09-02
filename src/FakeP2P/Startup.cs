@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FakeP2P.Hubs;
 using FakeP2P.Services;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +11,7 @@ namespace FakeP2P
     /// <summary>
     /// The startup class used.
     /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA1052", Justification = "Can't be static.")]
     public class Startup
     {
         /// <summary>

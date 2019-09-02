@@ -28,7 +28,7 @@ namespace FakeP2P.Controllers
         /// </summary>
         /// <returns>All servers available.</returns>
         [HttpGet("[action]")]
-        public IEnumerable<Server> GetServers()
+        public IEnumerable<HostedServer> GetServers()
             => serverService.GetAllServers();
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace FakeP2P.Controllers
         /// <param name="type">The type.</param>
         /// <returns>All servers available of the given type.</returns>
         [HttpGet("[action]/{type}")]
-        public IEnumerable<Server> GetServers(string type)
+        public IEnumerable<HostedServer> GetServers(string type)
             => serverService.GetAllServers().Where(x => x.Type == type);
     }
 }
